@@ -1,0 +1,34 @@
+name: Auto Update HackerRank Solutions
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # كل 6 ساعات
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run script
+        env:
+          HR_USERNAME: ${{ secrets.HR_USERNAME }}
+        run: python scrape.py
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "bot@example.com"
+          git config --local user.name "AutoBot"
+          git add .
+          git commit -m "Auto update" || echo "No changes"
+          git push
